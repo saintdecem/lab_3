@@ -22,20 +22,28 @@ function loadPopulation() {
 }
 
 function showPopulationTable() {
-    let html = '<table><tr><th>Год</th><th>Население (млн)</th></tr>';
-    populationData.forEach(row => {
-        html += `<tr><td>${row.year}</td><td>${row.population.toFixed(2)}</td></tr>`;
+    let html = '<table><tr><th>Год</th><th>Население (млн)</th><th>Изменение (%)</th></tr>';
+    populationData.forEach((row, i) => {
+        let change = '';
+        if (i > 0) {
+            const prev = populationData[i - 1].population;
+            const diff = ((row.population - prev) / prev * 100).toFixed(2);
+            const arrow = diff >= 0 ? '▲' : '▼';
+            const color = diff >= 0 ? 'green' : 'red';
+            change = `<span style="color:${color}">${arrow} ${diff}%</span>`;
+        }
+        html += `<tr><td>${row.year}</td><td>${row.population.toFixed(2)} млн</td><td>${change || '—'}</td></tr>`;
     });
     html += '</table>';
     document.getElementById('populationTable').innerHTML = html;
 }
 
 function showPopulationStats() {
-    let maxGrowth = { value: 0, year: '' };
-    let maxDecline = { value: 0, year: '' };
+    let maxGrowth = { value: -Infinity, year: '' };
+    let maxDecline = { value: Infinity, year: '' };
 
     for (let i = 1; i < populationData.length; i++) {
-        const prev = populationData[i-1].population;
+        const prev = populationData[i - 1].population;
         const curr = populationData[i].population;
         const change = ((curr - prev) / prev) * 100;
 
@@ -92,6 +100,11 @@ function calculateForecast() {
     const periods = parseInt(document.getElementById('forecastPeriods').value);
     const values = populationData.map(d => d.population);
     const lastYear = populationData[populationData.length - 1].year;
+
+    if (windowSize > values.length) {
+        alert('Размер окна не может быть больше количества данных!');
+        return;
+    }
 
     // Скользящая средняя
     const forecastValues = [...values];
