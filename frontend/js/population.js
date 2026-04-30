@@ -49,8 +49,8 @@ function showPopulationStats() {
 
     document.getElementById('populationStats').innerHTML = `
         <div class="stats-box">
-            📈 Максимальный прирост: <strong>${maxGrowth.value.toFixed(2)}%</strong> в ${maxGrowth.year} году<br>
-            📉 Максимальная убыль: <strong>${maxDecline.value.toFixed(2)}%</strong> в ${maxDecline.year} году
+            Максимальный прирост: <strong>${maxGrowth.value.toFixed(2)}%</strong> в ${maxGrowth.year} году<br>
+            Максимальная убыль: <strong>${maxDecline.value.toFixed(2)}%</strong> в ${maxDecline.year} году
         </div>
         <label>Окно скользящей средней: <input type="number" id="windowSize" value="3" min="2" max="10"></label>
         <label>Прогноз на лет: <input type="number" id="forecastPeriods" value="5" min="1" max="20"></label>
@@ -136,5 +136,5 @@ function calculateForecast() {
     });
 
     document.getElementById('populationForecast').innerHTML = 
-        `<div class="stats-box">🔮 Прогноз построен методом скользящей средней (окно: ${windowSize})</div>`;
+        `<div class="stats-box">Прогноз построен методом скользящей средней (окно: ${windowSize})</div>`;
 }
