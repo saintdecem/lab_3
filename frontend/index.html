@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №3 — Статистика России</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Статистический анализ данных России</h1>
+        
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('population')">Население</button>
+            <button class="tab" onclick="switchTab('currency')">Курс валют</button>
+            <button class="tab" onclick="switchTab('crime')">Преступность</button>
+        </div>
+
+        <!-- Вкладка: Население -->
+        <div id="population" class="tab-content active">
+            <h2>Численность населения России за 15 лет</h2>
+            <input type="file" id="populationFile" accept=".json">
+            <button onclick="loadPopulation()">Загрузить данные</button>
+            <div id="populationTable"></div>
+            <div id="populationStats"></div>
+            <canvas id="populationChart"></canvas>
+            <div id="populationForecast"></div>
+            <canvas id="populationForecastChart"></canvas>
+        </div>
+
+        <!-- Вкладка: Курс валют -->
+        <div id="currency" class="tab-content">
+            <h2>Курс рубля к USD и EUR</h2>
+            <p>Запустите сервер: <code>cd lisa_currency && python server.py</code></p>
+            <input type="file" id="currencyFile" accept=".xlsx,.xls,.json">
+            <button onclick="loadCurrency()">Загрузить и обработать</button>
+            <div id="currencyTable"></div>
+            <div id="currencyStats"></div>
+            <canvas id="currencyChart"></canvas>
+            <canvas id="currencyForecastChart"></canvas>
+        </div>
+
+        <!-- Вкладка: Преступность -->
+        <div id="crime" class="tab-content">
+            <h2>Преступность в России за 15 лет</h2>
+            <p>Запустите сервер: <code>cd vera_crime && python server.py</code></p>
+            <input type="file" id="crimeFile" accept=".json">
+            <button onclick="loadCrime()">Загрузить и обработать</button>
+            <div id="crimeTable"></div>
+            <div id="crimeStats"></div>
+            <canvas id="crimeChart"></canvas>
+            <canvas id="crimeForecastChart"></canvas>
+        </div>
+    </div>
+
+    <script src="js/population.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
