@@ -25,7 +25,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Crime Statistics in Russia (Variant 13)')
         self.setGeometry(100, 100, 1350, 920)
         
-        # ===== STRICT DARK STYLE =====
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #1a1a1a;
@@ -38,7 +37,6 @@ class MainWindow(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(16, 16, 16, 16)
         
-        # ===== HEADER =====
         header_frame = QFrame()
         header_frame.setStyleSheet("""
             QFrame {
@@ -50,20 +48,19 @@ class MainWindow(QMainWindow):
         header_layout = QVBoxLayout(header_frame)
         
         header = QLabel('CRIME STATISTICS IN RUSSIA')
-        header.setFont(QFont('Consolas', 18, QFont.Bold))
-        header.setStyleSheet("color: #cccccc; background: transparent; padding: 12px;")
+        header.setFont(QFont('Consolas', 22, QFont.Bold))
+        header.setStyleSheet("color: #cccccc; background: transparent; padding: 14px;")
         header.setAlignment(Qt.AlignCenter)
         header_layout.addWidget(header)
         
         subheader = QLabel('ANALYTICAL REPORT  |  2010-2024  |  FORECASTING BY MOVING AVERAGE')
-        subheader.setFont(QFont('Consolas', 10))
+        subheader.setFont(QFont('Consolas', 12))
         subheader.setStyleSheet("color: #666666; background: transparent; padding-bottom: 10px;")
         subheader.setAlignment(Qt.AlignCenter)
         header_layout.addWidget(subheader)
         
         layout.addWidget(header_frame)
         
-        # ===== CONTROL PANEL =====
         control_frame = QFrame()
         control_frame.setStyleSheet("""
             QFrame {
@@ -79,8 +76,8 @@ class MainWindow(QMainWindow):
                 background-color: #2a2a2a;
                 color: #999999;
                 border: 1px solid #444444;
-                padding: 10px 20px;
-                font-size: 12px;
+                padding: 12px 24px;
+                font-size: 14px;
                 font-family: 'Consolas';
                 text-transform: uppercase;
             }
@@ -107,7 +104,7 @@ class MainWindow(QMainWindow):
         
         ctrl_layout.addStretch()
         
-        lbl_style = "color: #888888; font-family: 'Consolas'; font-size: 11px;"
+        lbl_style = "color: #888888; font-family: 'Consolas'; font-size: 13px;"
         
         wlbl = QLabel('WINDOW (n):')
         wlbl.setStyleSheet(lbl_style)
@@ -118,10 +115,10 @@ class MainWindow(QMainWindow):
                 background-color: #252525;
                 color: #cccccc;
                 border: 1px solid #444444;
-                padding: 6px;
-                font-size: 12px;
+                padding: 7px;
+                font-size: 14px;
                 font-family: 'Consolas';
-                min-width: 60px;
+                min-width: 65px;
             }
             QSpinBox:focus {
                 border-color: #888888;
@@ -150,8 +147,8 @@ class MainWindow(QMainWindow):
                 background-color: #252525;
                 color: #888888;
                 border: 1px solid #555555;
-                padding: 10px 25px;
-                font-size: 12px;
+                padding: 12px 28px;
+                font-size: 14px;
                 font-family: 'Consolas';
                 text-transform: uppercase;
             }
@@ -166,20 +163,21 @@ class MainWindow(QMainWindow):
         
         layout.addWidget(control_frame)
         
-        # ===== TABLE =====
+
         self.table = QTableWidget()
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setFont(QFont('Consolas', 14))
         self.table.setStyleSheet("""
             QTableWidget {
                 background-color: #1a1a1a;
-                color: #b0b0b0;
+                color: #cccccc;
                 border: 1px solid #333333;
                 gridline-color: #2a2a2a;
                 font-family: 'Consolas';
-                font-size: 11px;
+                font-size: 16px;
             }
             QTableWidget::item {
-                padding: 6px;
+                padding: 10px;
             }
             QTableWidget::item:selected {
                 background-color: #333333;
@@ -189,33 +187,32 @@ class MainWindow(QMainWindow):
                 background-color: #000000;
                 color: #999999;
                 font-weight: bold;
-                padding: 10px;
+                padding: 14px;
                 border: none;
                 border-bottom: 2px solid #444444;
                 font-family: 'Consolas';
-                font-size: 11px;
+                font-size: 16px;
                 text-transform: uppercase;
             }
         """)
         layout.addWidget(self.table, 2)
         
-        # ===== STATS =====
         self.stats_label = QLabel()
         self.stats_label.setAlignment(Qt.AlignCenter)
-        self.stats_label.setFont(QFont('Consolas', 11))
-        self.stats_label.setMinimumHeight(50)
+        self.stats_label.setFont(QFont('Consolas', 13))
+        self.stats_label.setMinimumHeight(55)
         self.stats_label.setStyleSheet("""
             QLabel {
                 background-color: #1e1e1e;
                 color: #999999;
-                padding: 14px;
+                padding: 16px;
                 border: 1px solid #333333;
                 font-family: 'Consolas';
+                font-size: 14px;
             }
         """)
         layout.addWidget(self.stats_label)
         
-        # ===== GRAPH =====
         self.figure = Figure(figsize=(13, 5), facecolor='#1a1a1a')
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas, 3)
@@ -232,24 +229,58 @@ class MainWindow(QMainWindow):
         try:
             df = pd.read_excel(file_path)
             
+            column_map = {}
+            possible_names = {
+                'year': ['year', 'god', 'let'],
+                'murder': ['murder', 'murders', 'ubiystva', 'ubiy', 'killing', 'homicide'],
+                'robbery': ['robbery', 'robberies', 'razboi', 'razboy', 'rob'],
+                'theft': ['theft', 'thefts', 'krazha', 'krazhi', 'kraz', 'steal'],
+                'fraud': ['fraud', 'trickery', 'moshennichestvo', 'mosh', 'scam'],
+                'drugs': ['drugs', 'drug', 'narkotiki', 'narko', 'narc'],
+                'economic': ['economic', 'economy', 'ekonomicheskie', 'ekonom', 'econ']
+            }
+            
+            for col in df.columns:
+                col_lower = str(col).strip().lower()
+                for key, names in possible_names.items():
+                    if key not in column_map:
+                        for name in names:
+                            if name in col_lower:
+                                column_map[key] = col
+                                break
+            
+            required = ['year', 'murder', 'robbery', 'theft', 'fraud', 'drugs', 'economic']
+            missing = [k for k in required if k not in column_map]
+            if missing:
+                QMessageBox.critical(self, 'Column Error',
+                    f'Could not find columns: {missing}\n\n'
+                    f'Found columns: {list(df.columns)}\n\n'
+                    f'Expected columns about: year, murder, robbery, theft, fraud, drugs, economic')
+                return
+            
             self.data = []
             for _, row in df.iterrows():
                 record = {}
-                record['year'] = int(row['year'])
-                record['murder'] = float(str(row['murders']).replace(',', '.'))
-                record['robbery'] = float(str(row['robberies']).replace(',', '.'))
-                record['theft'] = float(str(row['thefts']).replace(',', '.'))
-                record['fraud'] = float(str(row['trickery']).replace(',', '.'))
-                record['drugs'] = float(str(row['drugs']).replace(',', '.'))
-                record['economic'] = float(str(row['economic']).replace(',', '.'))
+                for key in required:
+                    val = row[column_map[key]]
+                    if isinstance(val, str):
+                        val = val.replace(',', '.')
+                    record[key] = float(val)
+                record['year'] = int(record['year'])
                 self.data.append(record)
             
             self.show_table()
             self.show_stats()
             self.plot_data()
             
+        except FileNotFoundError:
+            QMessageBox.critical(self, 'Error', f'File not found:\n{file_path}')
+        except ValueError as e:
+            QMessageBox.critical(self, 'Data Error', f'Cannot parse data:\n{str(e)}')
+        except KeyError as e:
+            QMessageBox.critical(self, 'Column Error', f'Missing column:\n{str(e)}')
         except Exception as e:
-            print(f"Error: {e}")
+            QMessageBox.critical(self, 'Error', f'Unexpected error:\n{str(e)}')
     
     def show_table(self):
         self.table.setRowCount(len(self.data))
@@ -329,14 +360,14 @@ class MainWindow(QMainWindow):
             ax.plot([last_year] + forecast_years, [values[-1]] + forecast, 
                    '--', color=color, linewidth=2, alpha=0.4)
         
-        ax.set_xlabel('YEAR', color='#888888', fontsize=10, fontfamily='monospace')
-        ax.set_ylabel('CRIMES (thousands)', color='#888888', fontsize=10, fontfamily='monospace')
+        ax.set_xlabel('YEAR', color='#888888', fontsize=12, fontfamily='monospace')
+        ax.set_ylabel('CRIMES (thousands)', color='#888888', fontsize=12, fontfamily='monospace')
         ax.set_title(f'CRIME DYNAMICS & FORECAST (MOVING AVERAGE, n={window})', 
-                    color='#aaaaaa', fontsize=12, fontfamily='monospace')
-        ax.legend(loc='upper left', fontsize=8, facecolor='#1a1a1a', 
+                    color='#aaaaaa', fontsize=14, fontfamily='monospace')
+        ax.legend(loc='upper left', fontsize=10, facecolor='#1a1a1a', 
                  edgecolor='#444444', labelcolor='#cccccc')
         ax.grid(True, alpha=0.12, color='#444444')
-        ax.tick_params(colors='#888888', labelsize=9)
+        ax.tick_params(colors='#888888', labelsize=10)
         ax.spines['bottom'].set_color('#444444')
         ax.spines['left'].set_color('#444444')
         ax.spines['top'].set_visible(False)
