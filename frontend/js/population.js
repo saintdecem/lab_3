@@ -11,6 +11,8 @@ function loadPopulation() {
     reader.onload = function(e) {
         try {
             populationData = JSON.parse(e.target.result);
+            // Сортировка по годам на случай, если данные вразнобой
+            populationData.sort((a, b) => a.year - b.year);
             showPopulationTable();
             showPopulationStats();
             drawPopulationChart();
@@ -39,26 +41,27 @@ function showPopulationTable() {
 }
 
 function showPopulationStats() {
-    let maxGrowth = { value: -Infinity, year: '' };
-    let maxDecline = { value: Infinity, year: '' };
+    let maxGrowth = { value: -Infinity, year: '', absolute: 0 };
+    let maxDecline = { value: Infinity, year: '', absolute: 0 };
 
     for (let i = 1; i < populationData.length; i++) {
         const prev = populationData[i - 1].population;
         const curr = populationData[i].population;
         const change = ((curr - prev) / prev) * 100;
+        const absolute = curr - prev;
 
         if (change > maxGrowth.value) {
-            maxGrowth = { value: change, year: populationData[i].year };
+            maxGrowth = { value: change, year: populationData[i].year, absolute: absolute };
         }
         if (change < maxDecline.value) {
-            maxDecline = { value: change, year: populationData[i].year };
+            maxDecline = { value: change, year: populationData[i].year, absolute: absolute };
         }
     }
 
     document.getElementById('populationStats').innerHTML = `
         <div class="stats-box">
-            Максимальный прирост: <strong>${maxGrowth.value.toFixed(2)}%</strong> в ${maxGrowth.year} году<br>
-            Максимальная убыль: <strong>${maxDecline.value.toFixed(2)}%</strong> в ${maxDecline.year} году
+            Максимальный прирост: <strong>${maxGrowth.value.toFixed(2)}% (${maxGrowth.absolute > 0 ? '+' : ''}${maxGrowth.absolute.toFixed(2)} млн)</strong> в ${maxGrowth.year} году<br>
+            Максимальная убыль: <strong>${maxDecline.value.toFixed(2)}% (${maxDecline.absolute.toFixed(2)} млн)</strong> в ${maxDecline.year} году
         </div>
         <label>Окно скользящей средней: <input type="number" id="windowSize" value="3" min="2" max="10"></label>
         <label>Прогноз на лет: <input type="number" id="forecastPeriods" value="5" min="1" max="20"></label>
@@ -96,6 +99,12 @@ function drawPopulationChart() {
 }
 
 function calculateForecast() {
+    // Проверка, что данные загружены
+    if (populationData.length === 0) {
+        alert('Сначала загрузите данные!');
+        return;
+    }
+
     const windowSize = parseInt(document.getElementById('windowSize').value);
     const periods = parseInt(document.getElementById('forecastPeriods').value);
     const values = populationData.map(d => d.population);
@@ -121,7 +130,7 @@ function calculateForecast() {
     }
 
     const forecastData = forecastValues.slice(values.length);
-
+    
     // Отдельный график
     const ctx = document.getElementById('populationForecastChart').getContext('2d');
     if (forecastChart) forecastChart.destroy();
@@ -150,4 +159,12 @@ function calculateForecast() {
 
     document.getElementById('populationForecast').innerHTML = 
         `<div class="stats-box">Прогноз построен методом скользящей средней (окно: ${windowSize})</div>`;
+}
+
+function exportChart(canvasId, name) {
+    const canvas = document.getElementById(canvasId);
+    const link = document.createElement('a');
+    link.download = `график_${name}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
 }
