@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №3 — Статистика России</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Статистический анализ данных России</h1>
+        
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('population')">Население</button>
+            <button class="tab" onclick="switchTab('currency')">Курс валют</button>
+            <button class="tab" onclick="switchTab('crime')">Преступность</button>
+        </div>
+
+        <!-- Вкладка: Население -->
+        <div id="population" class="tab-content active">
+            <h2>Численность населения России за 15 лет</h2>
+            <input type="file" id="populationFile" accept=".json">
+            <button onclick="loadPopulation()">Загрузить данные</button>
+            <div id="populationTable"></div>
+            <div id="populationStats"></div>
+            <canvas id="populationChart"></canvas>
+            <div id="populationForecast"></div>
+            <canvas id="populationForecastChart"></canvas>
+            <button onclick="exportChart('populationChart', 'население')">Сохранить график как PNG</button>
+            <button onclick="exportChart('populationForecastChart', 'прогноз')">Сохранить график как PNG</button>
+        </div>
+
+        <!-- Вкладка: Курс валют -->
+        <div id="currency" class="tab-content">
+            <h2>Курс рубля к USD и EUR</h2>
+            <p>Запустите сервер: <code>cd lisa_currency && python lisa_currency_server.py</code></p>
+            <label>Окно скользящей средней: <input type="number" id="currencyWindowSize" value="5" min="2" max="30"></label>
+            <label>Прогноз на дней: <input type="number" id="currencyForecastPeriods" value="7" min="1" max="30"></label>
+            <button onclick="loadCurrency()">Загрузить и обработать</button>
+            <div id="currencyTable"></div>
+            <div id="currencyStats"></div>
+            <canvas id="currencyChart"></canvas>
+            <canvas id="currencyForecastChart"></canvas>
+        </div>
+
+        <!-- Вкладка: Преступность -->
+        <div id="crime" class="tab-content">
+            <h2>Преступность в России за 15 лет</h2>
+            <p>Запустите сервер: <code>cd vera_crime && python vera_crime_server.py</code></p>
+            <label>Окно скользящей средней: <input type="number" id="crimeWindowSize" value="3" min="1" max="10"></label>
+            <label>Прогноз на лет: <input type="number" id="crimeForecastPeriods" value="3" min="1" max="10"></label>
+            <button onclick="loadCrime()">Загрузить и обработать</button>
+            <div id="crimeTable"></div>
+            <div id="crimeStats"></div>
+            <canvas id="crimeChart"></canvas>
+            <canvas id="crimeForecastChart"></canvas>
+        </div>
+    </div>
+
+    <script src="js/chartRenderer.js"></script>
+    <script src="js/population.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
